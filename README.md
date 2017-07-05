@@ -25,7 +25,7 @@ This service currently rate-limits you to 1000 requests a day. I chose to poll
 on a 30 minute interval. If your IP address is changing more often than that,
 you either need to change ISPs, consider paying them for a static IP, or host
 whatever you're hosting at AWS directly and leverage other AWS features like
-Route 53 Alias Records and ALBs/ELBs. 
+Route 53 Alias Records and ALBs/ELBs.
 
 ### Providing Credentials
 You need to provide AWS credentials to the Python script in order to run this.
@@ -88,7 +88,8 @@ The `Dockerfile` in this repo will build an image based on `python:alpine`
 from DockerHub. It copies the Python script into `/`, and executes as user
 `nobody`.
 
-The latest version of this image should be available on DockerHub
+The latest version of this image should be available on DockerHub at
+https://hub.docker.com/r/jburks725/route53dynip/.
 
 ## Running the Docker container
 The Python script is the `ENTRYPOINT`, so you need only specify the
@@ -96,7 +97,8 @@ FQDN you want added to Route 53 Hosted Zone as an argument to the `docker run`
 command.
 
 # TODO
+1. ~~Add a license statement~~
 1. Allow customization of TTL
-2. Allow custom polling interval (currently 30 minutes)
-3. Maybe some logging verbosity control?
-4. Learn Python better!
+1. Allow custom polling interval (currently 30 minutes)
+1. Maybe some logging verbosity control?
+1. Learn Python better!
