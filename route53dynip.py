@@ -3,10 +3,20 @@
 import sys
 import json
 import urllib.request
+import signal
 import time
 from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
+
+class GracefulKiller:
+  kill_now = False
+  def __init__(self):
+    signal.signal(signal.SIGINT, self.exit_gracefully)
+    signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+  def exit_gracefully(self,signum, frame):
+    self.kill_now = True
 
 def get_ip():
     ''' get_ip() calls ipinfo.io/json to retrieve your current IP address
@@ -44,10 +54,15 @@ def update_route_53(client, zone_id, fqdn, ip_address):
         old_ip_address = \
             response['ResourceRecordSets'][0]['ResourceRecords'][0]['Value']
         if old_ip_address == ip_address:
+            print("%s: A record %s already points to %s" %
+                (datetime.now().strftime("%Y-%m-%d %X"), fqdn, ip_address))
             return
         print("%s: updating %s from %s to %s" %
             (datetime.now().strftime("%Y-%m-%d %X"), fqdn, old_ip_address,
             ip_address))
+    else:
+        print("%s: adding new A record %s pointing to %s" %
+            (datetime.now().strftime("%Y-%m-%d %X"), fqdn, ip_address))
 
     try:
         response = client.change_resource_record_sets(
@@ -113,11 +128,19 @@ zone_id = get_hosted_zone(client, fqdn)
 if zone_id == None:
     sys.exit(1)
 
+sleeper = GracefulKiller()
 while True:
+    # need to exit the infinite loop if we've gotten an exit signal
+    if sleeper.kill_now:
+        break
     ip = get_ip()
     if not ip == None:
         update_route_53(client, zone_id, fqdn, ip)
     else:
         print("%s: Could not get IP, skipping this interval",
             (datetime.now().strftime("%Y-%m-%d %X")))
-    time.sleep(1800)
+    for i in range(1800):
+        time.sleep(1)
+        if sleeper.kill_now:
+            break
+print("Thank you for using route53dynip. Have a nice day.")
