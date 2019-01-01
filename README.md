@@ -83,21 +83,44 @@ Once you've created that policy, create a new IAM user and generate a keypair
 for it. You may create a profile in your `~/.aws/credentials` file, or pass
 the credentials directly via environment variables.
 
-## Building the Docker image
-The `Dockerfile` in this repo will build an image based on `python:alpine`
-from DockerHub. It copies the Python script into `/`, and executes as user
-`nobody`.
+## Building the Docker image(s)
+The `Dockerfile`s in this repo will build an image based on `python:alpine` (amd64)
+and the arch-specific `python:slim-stretch` images for ARMv7 and ARMv8 (64-bit).
+
+The `build.sh` script will build images for `amd64`, `arm32v7`, and `arm64v8` architectures
+and push appropriate manifests to Docker Hub to support multiarch. It takes two arguments,
+the image tag (I use `jburks725/route53dynip`) and a version tag. Minimal error checking is
+done here, so use at your own risk.
+
+It copies the Python script into `/`, and executes as user `nobody`.
 
 The latest version of this image should be available on DockerHub at
 https://hub.docker.com/r/jburks725/route53dynip/.
 
-## Running the Docker container
+## Running the container in Docker
 The Python script is the `ENTRYPOINT`, so you need only specify the
 FQDN you want added to Route 53 Hosted Zone as an argument to the `docker run`
 command.
 
+## Running the deployment in Kubernetes
+Assuming your K8s cluster is running on a supported architecture, you should
+be able to run this using the included YAML files. You'll need to make some
+changes to these files to deploy.
+
+### Secrets
+Edit the `secrets.yaml` file to add your AWS Access and Secret keys in the appropriate
+places (look for the `{{}}` markers). Then deploy this to your cluster using `kubectl create -f secrets.yaml`.
+
+### Deployment
+Edit `deployment.yaml` to put the FQDN you want the utility to maintain in the `args` portion of the 
+pod template spec. Deploy it using `kubectl create -f deployment.yaml`. *Make sure you've created the
+secrets first!*
+
 # TODO
 1. ~~Add a license statement~~
+1. ~~Add multiarch support~~
+1. ~~Add basic Kubernetes support~~
+1. Improve Kubernetes security on the secrets
 1. Allow customization of TTL
 1. Allow custom polling interval (currently 30 minutes)
 1. Maybe some logging verbosity control?
