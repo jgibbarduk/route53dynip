@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: route53dynip
-        image: jburks725/route53dynip:latest
+        image: jburks725/route53dynip:2
         args: [ "{{vpn.YOURNAMEHERE.com}}" ]
         resources:
           requests:
