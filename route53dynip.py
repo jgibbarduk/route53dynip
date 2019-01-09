@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''A simple Dynamic DNS client for use with Route 53 hosted zones
 
-(c) 2017 - Jason Burks https://github.com/jburks725
+(c) 2017-2019 - Jason Burks https://github.com/jburks725
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import json
 import urllib.request
 import signal
 import time
+import argparse
 from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
@@ -132,10 +133,12 @@ def get_hosted_zone(client, name):
             return str.split(response['HostedZones'][0]['Id'], '/')[-1]
     print("Error: Could not find a hosted zone for", name)
 
-if len(sys.argv) != 2:
-    sys.exit("Error: missing argument for FQDN")
-
-fqdn = sys.argv[1]
+parser = argparse.ArgumentParser()
+parser.add_argument("fqdn", help="the FQDN to point your IP to")
+parser.add_argument("--onetime", help="update the DNS entry and exit",
+                    action="store_true")
+args = parser.parse_args()
+fqdn = args.fqdn
 if not fqdn.endswith('.'):
     fqdn = fqdn + '.'
 
@@ -155,8 +158,11 @@ while True:
     else:
         print("%s: Could not get IP, skipping this interval",
             (datetime.now().strftime("%Y-%m-%d %X")))
+    if args.onetime:
+        break
     for i in range(1800):
         time.sleep(1)
         if sleeper.kill_now:
             break
-print("Thank you for using route53dynip. Have a nice day.")
+if not args.onetime:
+    print("Thank you for using route53dynip. Have a nice day.")
