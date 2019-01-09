@@ -1,0 +1,30 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: route53dynip
+spec:
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: route53dynip
+            image: jburks725/route53dynip:2
+            args: [ "{{vpn.YOURNAMEHERE.com}}", "--onetime" ]
+            resources:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+            env:
+              - name: AWS_ACCESS_KEY_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: route53credentials
+                    key: accessKey
+              - name: AWS_SECRET_ACCESS_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: route53credentials
+                    key: secretKey
+          restartPolicy: OnFailure
