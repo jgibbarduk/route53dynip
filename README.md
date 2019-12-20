@@ -140,13 +140,19 @@ Edit `deployment.yaml` to put the FQDN you want the utility to maintain in the `
 pod template spec. Deploy it using `kubectl create -f deployment.yaml`. *Make sure you've created the
 secrets first!*
 
+### Deployment as a Cron Job
+
+Edit `cronjob.yaml` to put the FQDN you want the utility to maintain in the `args` portion of the 
+pod template spec. By default, the job will run every half hour. You can edit the schedule on line 6 if
+you'd like. See [crontab guru](https://crontab.guru) for more information on cron job schedule syntax.
+
 # TODO
-1. ~~Add a license statement~~
-1. ~~Add multiarch support~~
-1. ~~Add basic Kubernetes support~~
-1. Add support as a Kubernetes job
-1. Improve Kubernetes security on the secrets
-1. Allow customization of TTL
-1. Allow custom polling interval (currently 30 minutes)
-1. Maybe some logging verbosity control?
-1. Learn Python better!
+- [x] Add a license statement
+- [x] Add multiarch support
+- [x] Add basic Kubernetes support
+- [x] Add support as a Kubernetes cronjob
+- [ ] Helm Chart
+- [ ] Allow customization of TTL
+- [ ] Allow custom polling interval (currently 30 minutes)
+- [ ] Maybe some logging verbosity control?
+- [ ] Learn Python better!
