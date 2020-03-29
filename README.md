@@ -151,6 +151,7 @@ you'd like. See [crontab guru](https://crontab.guru) for more information on cro
 - [x] Add multiarch support
 - [x] Add basic Kubernetes support
 - [x] Add support as a Kubernetes cronjob
+- [x] Convert to proper Docker multi-arch build
 - [ ] Helm Chart
 - [ ] Allow customization of TTL
 - [ ] Allow custom polling interval (currently 30 minutes)
