@@ -10,7 +10,7 @@ spec:
         spec:
           containers:
           - name: route53dynip
-            image: jburks725/route53dynip:2
+            image: jburks725/route53dynip:5
             args: [ "{{vpn.YOURNAMEHERE.com}}", "--onetime" ]
             resources:
               requests:
