@@ -11,7 +11,7 @@ spec:
           containers:
           - name: route53dynip
             image: jburks725/route53dynip:5
-            args: [ "{{vpn.YOURNAMEHERE.com}}", "--onetime" ]
+            args: [ "vpn.{YOURDOMAIN}.com", "--onetime" ]
             resources:
               requests:
                 cpu: 100m
