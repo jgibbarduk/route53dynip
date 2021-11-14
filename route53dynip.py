@@ -135,6 +135,7 @@ def get_hosted_zone(client, name):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("fqdn", help="the FQDN to point your IP to")
+parser.add_argument("hosted_zone", help="the HostedZone where the DNS lives")
 parser.add_argument("--onetime", help="update the DNS entry and exit",
                     action="store_true")
 args = parser.parse_args()
@@ -143,7 +144,13 @@ if not fqdn.endswith('.'):
     fqdn = fqdn + '.'
 
 client = boto3.client('route53')
-zone_id = get_hosted_zone(client, fqdn)
+
+zone_id = None
+if args.hosted_zone:
+    zone_id = args.hosted_zone
+else:
+    get_hosted_zone(client, fqdn)
+
 if zone_id == None:
     sys.exit(1)
 
