@@ -68,8 +68,8 @@ def update_route_53(client, zone_id, fqdn, ip_address):
         return
     if response['ResourceRecordSets'][0]['Name'] == fqdn:
         # check if the ip address matches and skip the UPSERT
-        old_ip_address = \
-            response['ResourceRecordSets'][0]['ResourceRecords'][0]['Value']
+        print(response)
+        old_ip_address = response['ResourceRecordSets'][0]['ResourceRecords'][0]['Value']
         if old_ip_address == ip_address:
             print("%s: A record %s already points to %s" %
                 (datetime.now().strftime("%Y-%m-%d %X"), fqdn, ip_address))
@@ -129,27 +129,28 @@ def get_hosted_zone(client, name):
         if response['ResponseMetadata']['HTTPStatusCode'] != 200:
             print("Error searching for Route 53 Hosted Zone. Aborting.")
             return None
-        if response['HostedZones'][0]['Name'] == ZoneGuess:
-            return str.split(response['HostedZones'][0]['Id'], '/')[-1]
+        try: 
+            if response['HostedZones'][0]['Name'] == ZoneGuess:
+                zone = str.split(response['HostedZones'][0]['Id'], '/')[-1]
+                print('Found Hosted Zone:', zone)
+                return zone
+        except IndexError:
+            pass
+
     print("Error: Could not find a hosted zone for", name)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("fqdn", help="the FQDN to point your IP to")
-parser.add_argument("hosted_zone", help="the Hosted Zone where the DNS lives")
 parser.add_argument("--onetime", help="update the DNS entry and exit",
                     action="store_true")
+# parser.add_argument("hosted_zone", help="the Hosted Zone where the DNS lives", required=False)
 args = parser.parse_args()
 fqdn = args.fqdn
 if not fqdn.endswith('.'):
     fqdn = fqdn + '.'
 
 client = boto3.client('route53')
-
-zone_id = None
-if args.hosted_zone:
-    zone_id = args.hosted_zone
-else:
-    get_hosted_zone(client, fqdn)
+zone_id = get_hosted_zone(client, fqdn)
 
 if zone_id == None:
     sys.exit(1)

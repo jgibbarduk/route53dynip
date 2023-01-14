@@ -1,7 +1,7 @@
 SHELL := /bin/bash
-REGISTRY ?= docker.io
-IMG ?= jburks725/route53dynip
-VERSION ?= 1
+REGISTRY ?= ghcr.io
+IMG ?= jgibbarduk/route53dynip
+VERSION ?= 1.0.0
 
 # Architectures we can build for
 ARCHES = linux/amd64,linux/arm/v7,linux/arm64
@@ -13,13 +13,13 @@ update-base:
 
 .PHONY: docker-build-local
 docker-build-local:
-	docker build -f Dockerfile -t $(IMG):$(VERSION) . ;\
-	docker tag $(IMG):$(VERSION) $(IMG):latest ;\
+	docker build -f Dockerfile -t $(REGISTRY)/$(IMG):$(VERSION) . ;\
+	docker tag $(REGISTRY)/$(IMG):$(VERSION) $(IMG):latest ;\
 
 .PHONY: docker-push
 docker-push: docker-build-local
-	docker manifest push $(IMG):$(VERSION) ;\
-	docker manifest push $(IMG):latest
+	docker push $(REGISTRY)/$(IMG):$(VERSION) ;\
+	docker push $(REGISTRY)/$(IMG):latest
 
 .PHONY: docker-multiarch
 docker-multiarch:
