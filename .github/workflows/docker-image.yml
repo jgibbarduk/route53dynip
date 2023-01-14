@@ -30,8 +30,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64, darwin
           push: true
           tags: |
             ghcr.io/jgibbarduk/route53dynip:latest
-            ghcr.io/jgibbarduk/route53dyni:1.0.0
+            ghcr.io/jgibbarduk/route53dynip:1.0.0
