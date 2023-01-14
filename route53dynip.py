@@ -135,7 +135,7 @@ def get_hosted_zone(client, name):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("fqdn", help="the FQDN to point your IP to")
-parser.add_argument("hosted_zone", help="the HostedZone where the DNS lives")
+parser.add_argument("hosted_zone", help="the Hosted Zone where the DNS lives")
 parser.add_argument("--onetime", help="update the DNS entry and exit",
                     action="store_true")
 args = parser.parse_args()
