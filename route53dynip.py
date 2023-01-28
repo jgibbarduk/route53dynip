@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 import json
 import urllib.request
+import urllib.parse
 import signal
 import time
 import argparse
@@ -66,9 +67,15 @@ def update_route_53(client, zone_id, fqdn, ip_address):
     if response['ResponseMetadata']['HTTPStatusCode'] != 200:
         print("Error searching for Route 53 Resource Record Set. Aborting.")
         return
-    if response['ResourceRecordSets'][0]['Name'] == fqdn:
+
+    try:
+        # try to replace any special chars with the string literals
+        name = response['ResourceRecordSets'][0]['Name'].replace("\\052","*")
+    except Exception:
+        name = response['ResourceRecordSets'][0]['Name']
+
+    if name == fqdn:
         # check if the ip address matches and skip the UPSERT
-        print(response)
         old_ip_address = response['ResourceRecordSets'][0]['ResourceRecords'][0]['Value']
         if old_ip_address == ip_address:
             print("%s: A record %s already points to %s" %
@@ -78,6 +85,7 @@ def update_route_53(client, zone_id, fqdn, ip_address):
             (datetime.now().strftime("%Y-%m-%d %X"), fqdn, old_ip_address,
             ip_address))
     else:
+        # print(name)
         print("%s: adding new A record %s pointing to %s" %
             (datetime.now().strftime("%Y-%m-%d %X"), fqdn, ip_address))
 
